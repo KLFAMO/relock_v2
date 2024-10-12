@@ -1,0 +1,7 @@
+(sym_lib_table
+  (lib (name PID_POLBER-rescue)(type Legacy)(uri D:/Projekty/FAMO/PID_POLBER/PID_POLBER-rescue.lib)(options "")(descr ""))
+  (lib (name current100A-rescue)(type Legacy)(uri "D:/Projekty/FAMO/current100A/based on nucleo - ready/current100A-rescue.lib")(options "")(descr ""))
+  (lib (name some_wave-eagle-import)(type Legacy)(uri ${KIPRJMOD}/some_wave-eagle-import.lib)(options "")(descr ""))
+  (lib (name AD9912_nucleo-rescue)(type Legacy)(uri D:/Projekty/FAMO/AD9912_nucleo_v2/AD9912_nucleo-rescue.lib)(options "")(descr ""))
+  (lib (name AD9912_nucleo_v2-rescue)(type Legacy)(uri D:/Projekty/FAMO/AD9912_nucleo_v2/AD9912_nucleo_v2-rescue.lib)(options "")(descr ""))
+)
