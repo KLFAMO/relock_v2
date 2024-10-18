@@ -76,6 +76,9 @@ static void MX_DAC1_Init(void);
 extern struct netif gnetif;
 extern parameters par;
 int32_t raw;
+
+int raw1 = 0;
+int raw2 = 0;
 /* USER CODE END 0 */
 
 /**
@@ -127,6 +130,10 @@ int main(void)
   tcp_server_init();
   initInterface();
 
+  HAL_DAC_Start(&hdac1, DAC_CHANNEL_2);
+  HAL_DAC_SetValue(&hdac1, DAC_CHANNEL_2, DAC_ALIGN_12B_R, 1000);
+
+  HAL_DAC_Start(&hdac1, DAC_CHANNEL_1);
   HAL_DAC_SetValue(&hdac1, DAC_CHANNEL_1, DAC_ALIGN_12B_R, 1000);
 
 
@@ -440,6 +447,12 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   /* USER CODE BEGIN Callback 1 */
   if (htim->Instance == TIM7) {
 	  HAL_GPIO_WritePin(LD1_GPIO_Port, LD1_Pin, SET);
+
+	  raw1 = (int)(2000 + par.out1.val*4000/12.0);
+	  par.rout1.val = (double)raw1;
+	  raw2 = (int)(2000 + par.out2.val*4000/12.0);
+	  HAL_DAC_SetValue(&hdac1, DAC_CHANNEL_2, DAC_ALIGN_12B_R, raw1);
+	  HAL_DAC_SetValue(&hdac1, DAC_CHANNEL_1, DAC_ALIGN_12B_R, raw2);
 
 	  HAL_GPIO_WritePin(LD1_GPIO_Port, LD1_Pin, RESET);
     }

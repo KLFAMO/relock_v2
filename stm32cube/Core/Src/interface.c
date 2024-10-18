@@ -25,6 +25,12 @@ pointer getPointer(pointer p, char *s)
   if (strcmp(p.type, "parameters") == 0)
   {
     parameters *ptmp = (parameters *)p.p;
+    if (strcmp(s, "OUT1") == 0)
+      pout = (pointer){.p = (void *)&(ptmp->out1), .type = "value"};
+    if (strcmp(s, "ROUT1") == 0)
+      pout = (pointer){.p = (void *)&(ptmp->rout1), .type = "value"};
+    if (strcmp(s, "OUT2") == 0)
+      pout = (pointer){.p = (void *)&(ptmp->out2), .type = "value"};
     if (strcmp(s, "ADC") == 0)
       pout = (pointer){.p = (void *)&(ptmp->adc), .type = "adc"};
     if (strcmp(s, "DAC") == 0)
@@ -59,6 +65,8 @@ pointer getPointer(pointer p, char *s)
       sdac *ptmp = (sdac *)p.p;
       if (strcmp(s, "CH1") == 0)
         pout = (pointer){.p = (void *)&(ptmp->ch1), .type = "dacchannel"};
+      if (strcmp(s, "CH2") == 0)
+	    pout = (pointer){.p = (void *)&(ptmp->ch2), .type = "dacchannel"};
     }
 
   if (strcmp(p.type, "dacchannel") == 0)
@@ -126,6 +134,9 @@ void setParam(value *p, double val)
 
 void initInterface(void)
 {
+  par.out1 = (value){.val = 0, .min = -6, .max = 6};
+  par.out2 = (value){.val = 0, .min = -6, .max = 6};
+  par.rout1 = (value){.val = 0, .min = 0, .max = 4000};
   par.adc.ch1.avr = (value){.val = 50, .min = 1, .max = 100};
   par.adc.ch1.volt = (value){.val = 0, .min = 0, .max = 41000};
   par.adc.ch1.coron = (value){.val = 0, .min = 0, .max = 1};

@@ -55,6 +55,7 @@ typedef struct {
 
 typedef struct{
 	sdacchannel ch1;
+	sdacchannel ch2;
 } sdac;
 
 
@@ -62,6 +63,9 @@ typedef struct{
 typedef struct {
     sadc adc;
     sdac dac;
+    value out1;
+    value out2;
+    value rout1;
 } parameters;
 
 pointer getPointer(pointer,char * );
