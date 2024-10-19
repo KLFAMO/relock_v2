@@ -66,6 +66,7 @@ typedef struct {
     value out1;
     value out2;
     value rout1;
+    value in1;
 } parameters;
 
 pointer getPointer(pointer,char * );
