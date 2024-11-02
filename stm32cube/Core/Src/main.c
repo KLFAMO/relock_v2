@@ -25,7 +25,7 @@
 //#include "lwip/sockets.h"          <----
 //#include <string.h>
 #include "tcpServerRAW.h"
-//#include "tcpClientRAW.h"
+#include "tcpClientRAW.h"
 #include "interface.h"
 //#include <stdio.h>
 //#include <stdlib.h>
@@ -75,12 +75,16 @@ static void MX_ADC3_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
+volatile int data_received_flag = 0;
+
 extern struct netif gnetif;
 extern parameters par;
 int32_t raw;
 
 int raw1 = 0;
 int raw2 = 0;
+
+char received_text[100];
 /* USER CODE END 0 */
 
 /**
@@ -128,8 +132,6 @@ int main(void)
   MX_ADC3_Init();
   /* USER CODE BEGIN 2 */
 
-  tcp_server_init();
-  //tcp_client_init();
   tcp_server_init();
   initInterface();
 
@@ -524,6 +526,17 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	     adcResult = HAL_ADC_GetValue(&hadc3);
 	  }
 	  par.in1.val = (double)adcResult;
+
+	  if (par.send.val == 1){
+//		  received_text[0] = '\0';
+		  tcp_client_init(received_text);
+
+//		  HAL_Delay(10);
+
+		  par.send.val = atofmy(received_text);
+		  received_text[0] = '\0';
+
+	  }
 
 	  HAL_GPIO_WritePin(LD1_GPIO_Port, LD1_Pin, RESET);
     }

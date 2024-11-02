@@ -115,16 +115,18 @@ struct tcp_client_struct *esTx = 0;
 
 struct tcp_pcb *pcbTx = 0;
 
+const char *test_message = "data f1";
+
 void send_test()
 {
 	char buf[100];
 
 	/* Prepare the first message to send to the server */
 	counter++;
-	int len = sprintf (buf, "Hello TCPclient message %d\r\n", counter);
+	int len = sprintf (buf, "data f1\n");
 
-	if (counter !=0)
-	{
+//	if (counter !=0)
+//	{
 		/* allocate pbuf */
 		esTx->p = pbuf_alloc(PBUF_TRANSPORT, len , PBUF_POOL);
 
@@ -135,13 +137,9 @@ void send_test()
 		tcp_client_send(pcbTx, esTx);
 
 		pbuf_free(esTx->p);
-	}
+//	}
 
 }
-
-
-
-
 
 
 /* IMPLEMENTATION FOR TCP CLIENT
@@ -151,66 +149,46 @@ void send_test()
 3. start communicating
 */
 
-void tcp_client_init(void)
+void tcp_client_init(char *received_text_ptr)
 {
-	/* 1. create new tcp pcb */
-	struct tcp_pcb *tpcb;
+	struct tcp_pcb *tpcb = tcp_new();
+	if (tpcb == NULL) {
+		return;
+	}
 
-	tpcb = tcp_new();
+	// Ustaw adres IP i port serwera
+	ip_addr_t server_ip;
+	IP_ADDR4(&server_ip, 192, 168, 3, 204);  // Przykładowy adres IP serwera
+	uint16_t server_port = 2008;  // Przykładowy port serwera
 
-	/* 2. Connect to the server */
-	ip_addr_t destIPADDR;
-	IP_ADDR4(&destIPADDR, 192, 168, 1, 100);
-	tcp_connect(tpcb, &destIPADDR, 31, tcp_client_connected);
+	// Przekazanie wskaźnika na bufor jako argument do `tcp_client_connected`
+	tcp_arg(tpcb, received_text_ptr);
+
+	// Nawiązanie połączenia z serwerem
+	tcp_connect(tpcb, &server_ip, server_port, tcp_client_connected);
 }
 
 /** This callback is called, when the client is connected to the server
  * Here we will initialise few other callbacks
  * and in the end, call the client handle function
   */
-static err_t tcp_client_connected(void *arg, struct tcp_pcb *newpcb, err_t err)
+static err_t tcp_client_connected(void *arg, struct tcp_pcb *tpcb, err_t err)
 {
-  err_t ret_err;
-  struct tcp_client_struct *es;
+	if (err == ERR_OK) {
+		// Wysyłanie wiadomości testowej do serwera
+		err_t send_err = tcp_write(tpcb, test_message, strlen(test_message), TCP_WRITE_FLAG_COPY);
+		if (send_err == ERR_OK) {
+			tcp_output(tpcb);  // Wyślij dane
 
-  LWIP_UNUSED_ARG(arg);
-  LWIP_UNUSED_ARG(err);
-
-  /* allocate structure es to maintain tcp connection information */
-  es = (struct tcp_client_struct *)mem_malloc(sizeof(struct tcp_client_struct));
-  if (es != NULL)
-  {
-    es->state = ES_CONNECTED;
-    es->pcb = newpcb;
-    es->retries = 0;
-    es->p = NULL;
-
-    /* pass newly allocated es structure as argument to newpcb */
-    tcp_arg(newpcb, es);
-
-    /* initialize lwip tcp_recv callback function for newpcb  */
-    tcp_recv(newpcb, tcp_client_recv);
-
-    /* initialize lwip tcp_poll callback function for newpcb */
-    tcp_poll(newpcb, tcp_client_poll, 0);
-
-
-    /* initialize LwIP tcp_sent callback function */
-    tcp_sent(newpcb, tcp_client_sent);
-
-    /* handle the TCP data */
-    tcp_client_handle(newpcb, es);
-
-    ret_err = ERR_OK;
-  }
-  else
-  {
-    /*  close tcp connection */
-    tcp_client_connection_close(newpcb, es);
-    /* return memory error */
-    ret_err = ERR_MEM;
-  }
-  return ret_err;
+			// Ustawienie callbacka odbierającego dane od serwera
+			tcp_recv(tpcb, tcp_client_recv);
+		} else {
+			tcp_close(tpcb);
+		}
+	} else {
+		tcp_close(tpcb);
+	}
+	return ERR_OK;
 }
 
 
@@ -219,81 +197,102 @@ static err_t tcp_client_connected(void *arg, struct tcp_pcb *newpcb, err_t err)
   */
 static err_t tcp_client_recv(void *arg, struct tcp_pcb *tpcb, struct pbuf *p, err_t err)
 {
-  struct tcp_client_struct *es;
-  err_t ret_err;
+	if (p == NULL) {
+		// Serwer zamknął połączenie
+		tcp_close(tpcb);
+		return ERR_OK;
+	}
 
-  LWIP_ASSERT("arg != NULL",arg != NULL);
+	// Przekazany wskaźnik `arg` jest buforem tekstowym do zapisu danych
+	char *received_text_ptr = (char *)arg;
 
-  es = (struct tcp_client_struct *)arg;
+	// Skopiuj dane do bufora
+	snprintf(received_text_ptr, 100, "%.*s", p->len, (char *)p->payload);
 
-  /* if we receive an empty tcp frame from server => close connection */
-  if (p == NULL)
-  {
-    /* remote host closed connection */
-    es->state = ES_CLOSING;
-    if(es->p == NULL)
-    {
-       /* we're done sending, close connection */
-       tcp_client_connection_close(tpcb, es);
-    }
-    else
-    {
-      /* we're not done yet */
-//      /* acknowledge received packet */
-//      tcp_sent(tpcb, tcp_client_sent);
+	// Potwierdzenie odbioru danych i zwolnienie bufora
+	tcp_recved(tpcb, p->tot_len);
+	pbuf_free(p);
 
-      /* send remaining data*/
-//      tcp_client_send(tpcb, es);
-    }
-    ret_err = ERR_OK;
-  }
-  /* else : a non empty frame was received from server but for some reason err != ERR_OK */
-  else if(err != ERR_OK)
-  {
-    /* free received pbuf*/
-    if (p != NULL)
-    {
-      es->p = NULL;
-      pbuf_free(p);
-    }
-    ret_err = err;
-  }
-  else if(es->state == ES_CONNECTED)
-  {
-   /* store reference to incoming pbuf (chain) */
-    es->p = p;
+	// Zamknięcie połączenia po odbiorze
+	tcp_close(tpcb);
 
-    // tcp_sent has already been initialized in the beginning.
-//    /* initialize LwIP tcp_sent callback function */
-//    tcp_sent(tpcb, tcp_client_sent);
+	return ERR_OK;
 
-    /* Acknowledge the received data */
-    tcp_recved(tpcb, p->tot_len);
-
-    /* handle the received data */
-    tcp_client_handle(tpcb, es);
-
-    pbuf_free(p);
-
-    ret_err = ERR_OK;
-  }
-  else if(es->state == ES_CLOSING)
-  {
-    /* odd case, remote side closing twice, trash data */
-    tcp_recved(tpcb, p->tot_len);
-    es->p = NULL;
-    pbuf_free(p);
-    ret_err = ERR_OK;
-  }
-  else
-  {
-    /* unknown es->state, trash data  */
-    tcp_recved(tpcb, p->tot_len);
-    es->p = NULL;
-    pbuf_free(p);
-    ret_err = ERR_OK;
-  }
-  return ret_err;
+//  struct tcp_client_struct *es;
+//  err_t ret_err;
+//
+//  LWIP_ASSERT("arg != NULL",arg != NULL);
+//
+//  es = (struct tcp_client_struct *)arg;
+//
+//  /* if we receive an empty tcp frame from server => close connection */
+//  if (p == NULL)
+//  {
+//    /* remote host closed connection */
+//    es->state = ES_CLOSING;
+//    if(es->p == NULL)
+//    {
+//       /* we're done sending, close connection */
+//       tcp_client_connection_close(tpcb, es);
+//    }
+//    else
+//    {
+//      /* we're not done yet */
+////      /* acknowledge received packet */
+////      tcp_sent(tpcb, tcp_client_sent);
+//
+//      /* send remaining data*/
+////      tcp_client_send(tpcb, es);
+//    }
+//    ret_err = ERR_OK;
+//  }
+//  /* else : a non empty frame was received from server but for some reason err != ERR_OK */
+//  else if(err != ERR_OK)
+//  {
+//    /* free received pbuf*/
+//    if (p != NULL)
+//    {
+//      es->p = NULL;
+//      pbuf_free(p);
+//    }
+//    ret_err = err;
+//  }
+//  else if(es->state == ES_CONNECTED)
+//  {
+//   /* store reference to incoming pbuf (chain) */
+//    es->p = p;
+//
+//    // tcp_sent has already been initialized in the beginning.
+////    /* initialize LwIP tcp_sent callback function */
+////    tcp_sent(tpcb, tcp_client_sent);
+//
+//    /* Acknowledge the received data */
+//    tcp_recved(tpcb, p->tot_len);
+//
+//    /* handle the received data */
+//    tcp_client_handle(tpcb, es);
+//
+//    pbuf_free(p);
+//
+//    ret_err = ERR_OK;
+//  }
+//  else if(es->state == ES_CLOSING)
+//  {
+//    /* odd case, remote side closing twice, trash data */
+//    tcp_recved(tpcb, p->tot_len);
+//    es->p = NULL;
+//    pbuf_free(p);
+//    ret_err = ERR_OK;
+//  }
+//  else
+//  {
+//    /* unknown es->state, trash data  */
+//    tcp_recved(tpcb, p->tot_len);
+//    es->p = NULL;
+//    pbuf_free(p);
+//    ret_err = ERR_OK;
+//  }
+//  return ret_err;
 }
 
 

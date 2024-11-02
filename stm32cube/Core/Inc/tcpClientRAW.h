@@ -22,7 +22,7 @@
 #ifndef INC_TCPCLIENTRAW_H_
 #define INC_TCPCLIENTRAW_H_
 
-void tcp_client_init(void);
+void tcp_client_init(char *received_text_ptr);
 void send_test();
 
 #endif /* INC_TCPCLIENTRAW_H_ */

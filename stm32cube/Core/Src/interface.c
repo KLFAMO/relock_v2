@@ -37,6 +37,8 @@ pointer getPointer(pointer p, char *s)
       pout = (pointer){.p = (void *)&(ptmp->dac), .type = "dac"};
     if (strcmp(s, "IN1") == 0)
       pout = (pointer){.p = (void *)&(ptmp->in1), .type = "value"};
+    if (strcmp(s, "SEND") == 0)
+      pout = (pointer){.p = (void *)&(ptmp->send), .type = "value"};
   }
 
   if (strcmp(p.type, "adc") == 0)
@@ -145,6 +147,7 @@ void initInterface(void)
   par.adc.ch1.coron = (value){.val = 0, .min = 0, .max = 1};
   par.adc.ch1.corfactor = (value){.val = 1, .min = 0, .max = 100};
   par.dac.ch1.volt = (value){.val = 0, .min = 0, .max = 5};
+  par.send = (value){.val = 0, .min = 0, .max = 1};
 }
 
 /*------------------------*/
