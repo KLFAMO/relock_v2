@@ -61,6 +61,7 @@
 #include "lwip/tcp.h"
 
 extern parameters par;
+extern struct netif gnetif;
 /*  protocol states */
 enum tcp_server_states
 {
@@ -109,10 +110,11 @@ void tcp_server_init(void)
 
 	err_t err;
 
-	/* 2. bind _pcb to port 7 ( protocol) */
-	ip_addr_t myIPADDR;
-	IP_ADDR4(&myIPADDR, 192, 168, 3, 24);
-	err = tcp_bind(tpcb, &myIPADDR, 10);
+	/* 2. bind _pcb to port */
+//	ip_addr_t myIPADDR;
+//	IP_ADDR4(&myIPADDR, 192, 168, 3, 24);
+//	err = tcp_bind(tpcb, &myIPADDR, 10);
+	err = tcp_bind(tpcb, &gnetif.ip_addr, 10);
 
 	if (err == ERR_OK)
 	{
