@@ -68,11 +68,13 @@ typedef struct {
     value rout1;
     value in1;
     value send;
+    value wlmf;
 } parameters;
 
 pointer getPointer(pointer,char * );
 void initInterface(void);
 void setParam(value*, double);
+double atofmy(char *str);
 
 
 #endif /* INC_INTERFACE_H_ */

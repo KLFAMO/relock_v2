@@ -11,7 +11,6 @@
 #include <math.h>
 
 int rmwhite(char *str);
-double atofmy(char *str);
 int cmd_string_interpret(char *sin, char *sout);
 int cmd_interpret(char *sin, char *ssend);
 
@@ -39,6 +38,8 @@ pointer getPointer(pointer p, char *s)
       pout = (pointer){.p = (void *)&(ptmp->in1), .type = "value"};
     if (strcmp(s, "SEND") == 0)
       pout = (pointer){.p = (void *)&(ptmp->send), .type = "value"};
+    if (strcmp(s, "WLMF") == 0)
+      pout = (pointer){.p = (void *)&(ptmp->wlmf), .type = "value"};
   }
 
   if (strcmp(p.type, "adc") == 0)
@@ -148,6 +149,7 @@ void initInterface(void)
   par.adc.ch1.corfactor = (value){.val = 1, .min = 0, .max = 100};
   par.dac.ch1.volt = (value){.val = 0, .min = 0, .max = 5};
   par.send = (value){.val = 0, .min = 0, .max = 1};
+  par.wlmf = (value){.val = 0, .min = 0, .max = 100000000};
 }
 
 /*------------------------*/
@@ -365,32 +367,52 @@ int rmwhite(char *str)
   return 0;
 }
 
-double atofmy(char *str)
-{
-  double out;
-  int isdot = 0, i, len, dotpos = 0, inttemp;
-  len = strlen(str);
-  if (str[len - 1] == '\n')
-    len = len - 1;
-  for (i = 0; i < len; i++)
-  {
-    if (str[i] == '.')
-    {
-      if (isdot == 1)
-        return 0;
-      isdot = 1;
-      dotpos = i;
+double atofmy(char *str) {
+    double result = 0.0;  // result
+    double fraction_part = 0.0;
+    int sign = 1;
+    int i = 0;
+    int is_fraction = 0;
+    double divisor = 10.0;
+
+    // cut on the first white space
+    while (str[i] == ' ' || str[i] == '\t') {
+        i++;
     }
-    if (isdot == 1)
-    {
-      str[i] = str[i + 1];
+
+    // check sign
+    if (str[i] == '-') {
+        sign = -1;
+        i++;
+    } else if (str[i] == '+') {
+        i++;
     }
-  }
-  inttemp = atoi(str);
-  out = (double)inttemp;
-  if (isdot)
-    out = out * pow(10, -1 * (len - dotpos - 1));
-  return out;
+
+    // integer part
+    while (str[i] != '\0') {
+        if (str[i] == '.') {
+            // start fractional part
+            is_fraction = 1;
+            i++;
+            continue;
+        }
+
+        // Check if digit
+        if (str[i] >= '0' && str[i] <= '9') {
+            if (!is_fraction) {
+                result = result * 10 + (str[i] - '0');
+            } else {
+                fraction_part += (str[i] - '0') / divisor;
+                divisor *= 10.0;
+            }
+        } else {
+            break;
+        }
+        i++;
+    }
+    result += fraction_part;
+    result *= sign;
+    return result;
 }
 
 int ftostr(char *str, double val)
@@ -411,8 +433,8 @@ int ftostr(char *str, double val)
     istr++;
     val = -1 * val;
   }
-  factor = 100000000;
-  while (factor > 0.00000001 && factor > val)
+  factor = 1000000;
+  while (factor > 0.000000000001 && factor > val)
     factor = factor / 10;
   order = (int)log10(factor);
   if (order < 0)
@@ -428,7 +450,7 @@ int ftostr(char *str, double val)
       istr++;
     }
   }
-  for (j = 0; j < 10; j++)
+  for (j = 0; j < 15; j++)
   {
     for (i = 9; i >= 0; i--)
     {

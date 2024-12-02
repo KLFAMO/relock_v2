@@ -83,6 +83,7 @@ int32_t raw;
 
 int raw1 = 0;
 int raw2 = 0;
+int tim7_cnt = 0;
 
 char received_text[100];
 /* USER CODE END 0 */
@@ -528,15 +529,20 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	  par.in1.val = (double)adcResult;
 
 	  if (par.send.val == 1){
-//		  received_text[0] = '\0';
+      // received_text[0] = '\0';
+      par.send.val = 0;
 		  tcp_client_init(received_text);
-
-//		  HAL_Delay(10);
-
-		  par.send.val = atofmy(received_text);
+		  par.wlmf.val = atofmy(received_text);
 		  received_text[0] = '\0';
-
 	  }
+
+    if (tim7_cnt > 5000){
+      tim7_cnt = 0;
+		  tcp_client_init(received_text);
+		  par.wlmf.val = atofmy(received_text);
+		  received_text[0] = '\0';
+	  }
+    tim7_cnt++;
 
 	  HAL_GPIO_WritePin(LD1_GPIO_Port, LD1_Pin, RESET);
     }

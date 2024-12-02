@@ -115,7 +115,7 @@ struct tcp_client_struct *esTx = 0;
 
 struct tcp_pcb *pcbTx = 0;
 
-const char *test_message = "data f1";
+const char *test_message = "f 5";
 
 void send_test()
 {
@@ -156,10 +156,10 @@ void tcp_client_init(char *received_text_ptr)
 		return;
 	}
 
-	// Ustaw adres IP i port serwera
+	// Set server IP and port
 	ip_addr_t server_ip;
-	IP_ADDR4(&server_ip, 192, 168, 3, 204);  // Przykładowy adres IP serwera
-	uint16_t server_port = 2008;  // Przykładowy port serwera
+	IP_ADDR4(&server_ip, 192, 168, 3, 212);
+	uint16_t server_port = 2005;
 
 	// Przekazanie wskaźnika na bufor jako argument do `tcp_client_connected`
 	tcp_arg(tpcb, received_text_ptr);
