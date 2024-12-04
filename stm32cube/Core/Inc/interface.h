@@ -82,6 +82,7 @@ typedef struct {
     value rout1;
     value in1;
     value in2;
+    value in3;
     value send;
     swlm wlm;
     value mode;

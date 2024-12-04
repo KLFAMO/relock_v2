@@ -38,6 +38,8 @@ pointer getPointer(pointer p, char *s)
       pout = (pointer){.p = (void *)&(ptmp->in1), .type = "value"};
     if (strcasecmp(s, "IN2") == 0)
       pout = (pointer){.p = (void *)&(ptmp->in2), .type = "value"};
+    if (strcasecmp(s, "IN3") == 0)
+      pout = (pointer){.p = (void *)&(ptmp->in3), .type = "value"};
     if (strcasecmp(s, "SEND") == 0)
       pout = (pointer){.p = (void *)&(ptmp->send), .type = "value"};
     if (strcasecmp(s, "WLM") == 0)
@@ -179,6 +181,7 @@ void initInterface(void)
   par.rout1 = (value){.val = 0, .min = 0, .max = 4000};
   par.in1 = (value){.val = 0, .min = -400000, .max = 400000};
   par.in2 = (value){.val = 0, .min = -400000, .max = 400000};
+  par.in3 = (value){.val = 0, .min = -400000, .max = 400000};
   par.adc.ch1.avr = (value){.val = 50, .min = 1, .max = 100};
   par.adc.ch1.volt = (value){.val = 0, .min = 0, .max = 41000};
   par.adc.ch1.coron = (value){.val = 0, .min = 0, .max = 1};

@@ -552,13 +552,9 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 
     // get adc values
     Read_ADC_Values();
-	  // HAL_ADC_Start(&hadc3);
-	  // uint32_t adcResult = 0;
-	  // if (HAL_ADC_PollForConversion(&hadc3, HAL_MAX_DELAY) == HAL_OK){
-	  //    adcResult = HAL_ADC_GetValue(&hadc3);
-	  // }
 	  par.in1.val = (double)adcResults[0];
     par.in2.val = (double)adcResults[1];
+    par.in3.val = (double)adcResults[2];
 
     // reading wavelength
     if (tim7_cnt > 5000 && par.wlm.on.val == 1){
@@ -574,8 +570,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 
       if (par.unl.last_on.val == 0){
         // if unlim turned on - save setting point and reset controller
-        par.unl.vset.val = par.in1.val;
-        par.unl.aerr.val = 0;
+        setParam(&par.unl.vset, par.in1.val);
+        setParam(&par.unl.aerr, 0);
       }
 
       // controller
