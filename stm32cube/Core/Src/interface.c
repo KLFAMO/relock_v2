@@ -193,8 +193,8 @@ void initInterface(void)
   par.unl.P = (value){.val = 0, .min = -100, .max = 100};
   par.unl.I = (value){.val = 0, .min = -100, .max = 100};
   par.unl.sign = (value){.val = 1, .min = -1, .max = 1};
-  par.unl.err = (value){.val = 0, .min = -1000000, .max = 1000000};
-  par.unl.aerr = (value){.val = 0, .min = -1000000, .max = 10000000};
+  par.unl.err = (value){.val = 0, .min = -100000, .max = 100000};
+  par.unl.aerr = (value){.val = 0, .min = -10000000, .max = 10000000};
 }
 
 /*------------------------*/

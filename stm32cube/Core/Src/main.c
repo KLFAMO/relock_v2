@@ -532,12 +532,37 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	  }
     tim7_cnt++;
 
-    if (par.mode.val == 1){ 
+    if (par.unl.on.val == 1){
       //unlimited mode
 
-    
+      if (par.unl.last_on.val == 0){
+        // if unlim turned on - save setting point and reset controller
+        par.unl.vset.val = par.in1.val;
+        par.unl.aerr.val = 0;
+      }
+
+      // controller
+      par.unl.err.val = par.in1.val - par.unl.vset.val;
+      par.unl.aerr.val += par.unl.err.val;
+      par.out1.val = par.unl.I.val * par.unl.aerr.val;
+      // limit output 1
+      if (par.out1.val > par.out1.max)
+        par.out1.val = par.out1.max;
+      if (par.out1.val < par.out1.min)
+        par.out1.val = par.out1.min;
+      // limit aerr
+      if (par.unl.aerr.val > par.unl.aerr.max)
+        par.unl.aerr.val = par.unl.aerr.max;
+      if (par.unl.aerr.val < par.unl.aerr.min)
+        par.unl.aerr.val = par.unl.aerr.min;
 
     }
+    else{
+      // when switching off unlim, set out to 0
+      if (par.unl.last_on.val == 1)
+        par.out1.val = 0;
+    }
+    par.unl.last_on.val = par.unl.on.val;
 
     // update DAC based on par.out1, par.out2
 	  raw1 = (int)(2000 + par.out1.val*4000/12.0);
