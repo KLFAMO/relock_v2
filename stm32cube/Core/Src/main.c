@@ -75,6 +75,14 @@ static void MX_ADC3_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
+uint32_t adcChannels[3] = {
+    ADC_CHANNEL_2,  // ADC3_INP2
+    ADC_CHANNEL_3,  // ADC3_INP3
+    ADC_CHANNEL_7   // ADC3_INP7
+};
+
+uint32_t adcResults[3];
+
 volatile int data_received_flag = 0;
 
 extern struct netif gnetif;
@@ -86,6 +94,8 @@ int raw2 = 0;
 int tim7_cnt = 0;
 
 char received_text[100];
+
+void Read_ADC_Values();
 /* USER CODE END 0 */
 
 /**
@@ -453,6 +463,30 @@ static void MX_GPIO_Init(void)
 
 /* USER CODE BEGIN 4 */
 
+void Read_ADC_Values() {
+    ADC_ChannelConfTypeDef sConfig;
+
+    for (int i = 0; i < 3; i++) {
+        // Konfiguracja kanału
+        sConfig.Channel = adcChannels[i];
+        sConfig.Rank = ADC_REGULAR_RANK_1;
+        sConfig.SamplingTime = ADC_SAMPLETIME_64CYCLES_5;
+        sConfig.SingleDiff = ADC_SINGLE_ENDED; // Single-ended
+        sConfig.OffsetNumber = ADC_OFFSET_NONE; // Brak offsetu
+        sConfig.Offset = 0;
+        sConfig.OffsetSignedSaturation = DISABLE;
+
+        if (HAL_ADC_ConfigChannel(&hadc3, &sConfig) != HAL_OK) {
+            Error_Handler();
+        }
+
+        HAL_ADC_Start(&hadc3);
+        if (HAL_ADC_PollForConversion(&hadc3, HAL_MAX_DELAY) == HAL_OK) {
+            adcResults[i] = HAL_ADC_GetValue(&hadc3);
+        }
+        HAL_ADC_Stop(&hadc3);
+    }
+}
 
 /* USER CODE END 4 */
 
@@ -517,13 +551,16 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 
 
     // get adc values
-	  HAL_ADC_Start(&hadc3);
-	  uint32_t adcResult = 0;
-	  if (HAL_ADC_PollForConversion(&hadc3, HAL_MAX_DELAY) == HAL_OK){
-	     adcResult = HAL_ADC_GetValue(&hadc3);
-	  }
-	  par.in1.val = (double)adcResult;
+    Read_ADC_Values();
+	  // HAL_ADC_Start(&hadc3);
+	  // uint32_t adcResult = 0;
+	  // if (HAL_ADC_PollForConversion(&hadc3, HAL_MAX_DELAY) == HAL_OK){
+	  //    adcResult = HAL_ADC_GetValue(&hadc3);
+	  // }
+	  par.in1.val = (double)adcResults[0];
+    par.in2.val = (double)adcResults[1];
 
+    // reading wavelength
     if (tim7_cnt > 5000 && par.wlm.on.val == 1){
       tim7_cnt = 0;
 		  tcp_client_init(received_text);
@@ -542,25 +579,14 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
       }
 
       // controller
-      par.unl.err.val = par.in1.val - par.unl.vset.val;
-      par.unl.aerr.val += par.unl.err.val;
-      par.out1.val = par.unl.I.val * par.unl.aerr.val;
-      // limit output 1
-      if (par.out1.val > par.out1.max)
-        par.out1.val = par.out1.max;
-      if (par.out1.val < par.out1.min)
-        par.out1.val = par.out1.min;
-      // limit aerr
-      if (par.unl.aerr.val > par.unl.aerr.max)
-        par.unl.aerr.val = par.unl.aerr.max;
-      if (par.unl.aerr.val < par.unl.aerr.min)
-        par.unl.aerr.val = par.unl.aerr.min;
-
+      setParam(&par.unl.err, par.in1.val - par.unl.vset.val);
+      setParam(&par.unl.aerr, par.unl.aerr.val + par.unl.err.val);
+      setParam(&par.out1, par.unl.I.val * par.unl.aerr.val);
     }
     else{
       // when switching off unlim, set out to 0
       if (par.unl.last_on.val == 1)
-        par.out1.val = 0;
+        setParam(&par.out1, 0);
     }
     par.unl.last_on.val = par.unl.on.val;
 
