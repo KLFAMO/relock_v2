@@ -63,7 +63,15 @@ typedef struct{
     value f;
 } swlm;
 
-
+typedef struct{
+    value on;
+    value vset;
+    value P;
+    value I;
+    value sign;
+    value err;
+    value aerr;
+} sunl;
 
 typedef struct {
     sadc adc;
@@ -72,8 +80,11 @@ typedef struct {
     value out2;
     value rout1;
     value in1;
+    value in2;
     value send;
     swlm wlm;
+    value mode;
+    sunl unl;
 } parameters;
 
 pointer getPointer(pointer,char * );

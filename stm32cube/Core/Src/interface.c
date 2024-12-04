@@ -36,10 +36,16 @@ pointer getPointer(pointer p, char *s)
       pout = (pointer){.p = (void *)&(ptmp->dac), .type = "dac"};
     if (strcmp(s, "IN1") == 0)
       pout = (pointer){.p = (void *)&(ptmp->in1), .type = "value"};
+    if (strcmp(s, "IN2") == 0)
+      pout = (pointer){.p = (void *)&(ptmp->in2), .type = "value"};
     if (strcmp(s, "SEND") == 0)
       pout = (pointer){.p = (void *)&(ptmp->send), .type = "value"};
     if (strcmp(s, "WLM") == 0)
       pout = (pointer){.p = (void *)&(ptmp->wlm), .type = "wlm"};
+    if (strcmp(s, "MODE") == 0)
+      pout = (pointer){.p = (void *)&(ptmp->mode), .type = "value"};
+    if (strcmp(s, "UNL") == 0)
+      pout = (pointer){.p = (void *)&(ptmp->unl), .type = "unl"};
   }
 
   if (strcmp(p.type, "adc") == 0)
@@ -90,6 +96,25 @@ pointer getPointer(pointer p, char *s)
             pout = (pointer){.p = (void *)&(ptmp->f), .type = "value"};
       if (strcmp(s, "ON") == 0)
             pout = (pointer){.p = (void *)&(ptmp->on), .type = "value"};
+    }
+  
+  if (strcmp(p.type, "unl") == 0)
+    {
+      sunl *ptmp = (sunl *)p.p;
+      if (strcmp(s, "ON") == 0)
+            pout = (pointer){.p = (void *)&(ptmp->on), .type = "value"};
+      if (strcmp(s, "VSET") == 0)
+            pout = (pointer){.p = (void *)&(ptmp->vset), .type = "value"};
+      if (strcmp(s, "P") == 0)
+            pout = (pointer){.p = (void *)&(ptmp->P), .type = "value"};
+      if (strcmp(s, "I") == 0)
+            pout = (pointer){.p = (void *)&(ptmp->I), .type = "value"};
+      if (strcmp(s, "SIGN") == 0)
+            pout = (pointer){.p = (void *)&(ptmp->sign), .type = "value"};
+      if (strcmp(s, "ERR") == 0)
+            pout = (pointer){.p = (void *)&(ptmp->err), .type = "value"};
+      if (strcmp(s, "AERR") == 0)
+            pout = (pointer){.p = (void *)&(ptmp->aerr), .type = "value"};
     }
 
   if (strcmp(p.type, "value") == 0)
@@ -148,10 +173,12 @@ void setParam(value *p, double val)
 
 void initInterface(void)
 {
+  par.mode = (value){.val = 0, .min = 0, .max = 1};
   par.out1 = (value){.val = 0, .min = -6, .max = 6};
   par.out2 = (value){.val = 0, .min = -6, .max = 6};
   par.rout1 = (value){.val = 0, .min = 0, .max = 4000};
   par.in1 = (value){.val = 0, .min = -400000, .max = 400000};
+  par.in2 = (value){.val = 0, .min = -400000, .max = 400000};
   par.adc.ch1.avr = (value){.val = 50, .min = 1, .max = 100};
   par.adc.ch1.volt = (value){.val = 0, .min = 0, .max = 41000};
   par.adc.ch1.coron = (value){.val = 0, .min = 0, .max = 1};
@@ -160,6 +187,14 @@ void initInterface(void)
   par.send = (value){.val = 0, .min = 0, .max = 1};
   par.wlm.f = (value){.val = 0, .min = 0, .max = 100000000};
   par.wlm.on = (value){.val = 0, .min = 0, .max = 1};
+
+  par.unl.on = (value){.val = 0, .min = 0, .max = 1};
+  par.unl.vset = (value){.val = 0, .min = -2000, .max = 2000};
+  par.unl.P = (value){.val = 0, .min = -100, .max = 100};
+  par.unl.I = (value){.val = 0, .min = -100, .max = 100};
+  par.unl.sign = (value){.val = 1, .min = -1, .max = 1};
+  par.unl.err = (value){.val = 0, .min = -1000000, .max = 1000000};
+  par.unl.aerr = (value){.val = 0, .min = -1000000, .max = 10000000};
 }
 
 /*------------------------*/

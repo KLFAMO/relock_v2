@@ -515,12 +515,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   if (htim->Instance == TIM7) {
 	  HAL_GPIO_WritePin(LD1_GPIO_Port, LD1_Pin, SET);
 
-	  raw1 = (int)(2000 + par.out1.val*4000/12.0);
-	  par.rout1.val = (double)raw1;
-	  raw2 = (int)(2000 + par.out2.val*4000/12.0);
-	  HAL_DAC_SetValue(&hdac1, DAC_CHANNEL_2, DAC_ALIGN_12B_R, raw1);
-	  HAL_DAC_SetValue(&hdac1, DAC_CHANNEL_1, DAC_ALIGN_12B_R, raw2);
 
+    // get adc values
 	  HAL_ADC_Start(&hadc3);
 	  uint32_t adcResult = 0;
 	  if (HAL_ADC_PollForConversion(&hadc3, HAL_MAX_DELAY) == HAL_OK){
@@ -535,6 +531,20 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 		  received_text[0] = '\0';
 	  }
     tim7_cnt++;
+
+    if (par.mode.val == 1){ 
+      //unlimited mode
+
+    
+
+    }
+
+    // update DAC based on par.out1, par.out2
+	  raw1 = (int)(2000 + par.out1.val*4000/12.0);
+	  par.rout1.val = (double)raw1;
+	  raw2 = (int)(2000 + par.out2.val*4000/12.0);
+	  HAL_DAC_SetValue(&hdac1, DAC_CHANNEL_2, DAC_ALIGN_12B_R, raw1);
+	  HAL_DAC_SetValue(&hdac1, DAC_CHANNEL_1, DAC_ALIGN_12B_R, raw2);
 
 	  HAL_GPIO_WritePin(LD1_GPIO_Port, LD1_Pin, RESET);
     }
