@@ -58,6 +58,11 @@ typedef struct{
 	sdacchannel ch2;
 } sdac;
 
+typedef struct{
+    value on;
+    value f;
+} swlm;
+
 
 
 typedef struct {
@@ -68,7 +73,7 @@ typedef struct {
     value rout1;
     value in1;
     value send;
-    value wlmf;
+    swlm wlm;
 } parameters;
 
 pointer getPointer(pointer,char * );

@@ -528,18 +528,10 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	  }
 	  par.in1.val = (double)adcResult;
 
-	  if (par.send.val == 1){
-      // received_text[0] = '\0';
-      par.send.val = 0;
-		  tcp_client_init(received_text);
-		  par.wlmf.val = atofmy(received_text);
-		  received_text[0] = '\0';
-	  }
-
-    if (tim7_cnt > 5000){
+    if (tim7_cnt > 5000 && par.wlm.on.val == 1){
       tim7_cnt = 0;
 		  tcp_client_init(received_text);
-		  par.wlmf.val = atofmy(received_text);
+		  par.wlm.f.val = atofmy(received_text);
 		  received_text[0] = '\0';
 	  }
     tim7_cnt++;

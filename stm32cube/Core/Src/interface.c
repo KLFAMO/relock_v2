@@ -38,8 +38,8 @@ pointer getPointer(pointer p, char *s)
       pout = (pointer){.p = (void *)&(ptmp->in1), .type = "value"};
     if (strcmp(s, "SEND") == 0)
       pout = (pointer){.p = (void *)&(ptmp->send), .type = "value"};
-    if (strcmp(s, "WLMF") == 0)
-      pout = (pointer){.p = (void *)&(ptmp->wlmf), .type = "value"};
+    if (strcmp(s, "WLM") == 0)
+      pout = (pointer){.p = (void *)&(ptmp->wlm), .type = "wlm"};
   }
 
   if (strcmp(p.type, "adc") == 0)
@@ -81,6 +81,15 @@ pointer getPointer(pointer p, char *s)
             pout = (pointer){.p = (void *)&(ptmp->raw), .type = "value"};
       if (strcmp(s, "VOLT") == 0)
         pout = (pointer){.p = (void *)&(ptmp->volt), .type = "value"};
+    }
+
+  if (strcmp(p.type, "wlm") == 0)
+    {
+      swlm *ptmp = (swlm *)p.p;
+      if (strcmp(s, "F") == 0)
+            pout = (pointer){.p = (void *)&(ptmp->f), .type = "value"};
+      if (strcmp(s, "ON") == 0)
+            pout = (pointer){.p = (void *)&(ptmp->on), .type = "value"};
     }
 
   if (strcmp(p.type, "value") == 0)
@@ -149,7 +158,8 @@ void initInterface(void)
   par.adc.ch1.corfactor = (value){.val = 1, .min = 0, .max = 100};
   par.dac.ch1.volt = (value){.val = 0, .min = 0, .max = 5};
   par.send = (value){.val = 0, .min = 0, .max = 1};
-  par.wlmf = (value){.val = 0, .min = 0, .max = 100000000};
+  par.wlm.f = (value){.val = 0, .min = 0, .max = 100000000};
+  par.wlm.on = (value){.val = 0, .min = 0, .max = 1};
 }
 
 /*------------------------*/
@@ -256,7 +266,6 @@ int cmd_interpret(char *sin, char *ssend)
 
   if (sarg[0] == '?')
   {
-	  strcat(ssend, "*?*\n");
     if (strcmp(parg.type, "double") == 0){
     	//strcat(ssend, "*double*\n");
     	ftostr(stmp, *((double *)(parg.p)));
