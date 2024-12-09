@@ -192,7 +192,7 @@ void initInterface(void)
   par.wlm.on = (value){.val = 0, .min = 0, .max = 1};
 
   par.unl.on = (value){.val = 0, .min = 0, .max = 1};
-  par.unl.vset = (value){.val = 0, .min = -2000, .max = 2000};
+  par.unl.vset = (value){.val = 0, .min = 0, .max = 100000};
   par.unl.P = (value){.val = 0, .min = -100, .max = 100};
   par.unl.I = (value){.val = -0.0000003, .min = -100, .max = 100};
   par.unl.sign = (value){.val = 1, .min = -1, .max = 1};
