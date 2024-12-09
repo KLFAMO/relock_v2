@@ -571,6 +571,17 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	  }
     tim7_cnt++;
 
+    //check switch status
+    if(HAL_GPIO_ReadPin(PUSH_GPIO_Port, PUSH_Pin)==GPIO_PIN_SET){
+      par.unl.sw_on.val = 0;
+    }else{
+      par.unl.sw_on.val = 1;
+    }
+    if (par.unl.sw_on.val != par.unl.last_sw_on.val){
+      par.unl.on.val = par.unl.sw_on.val;
+    }
+    par.unl.last_sw_on.val = par.unl.sw_on.val;
+
     if (par.unl.on.val == 1){
       //unlimited mode
 

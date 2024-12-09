@@ -66,6 +66,8 @@ typedef struct{
 typedef struct{
     value on;
     value last_on;
+    value sw_on;
+    value last_sw_on;
     value vset;
     value P;
     value I;
