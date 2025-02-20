@@ -82,6 +82,10 @@ typedef struct{
 } sunl;
 
 typedef struct {
+    double version;
+    value save;
+    value load;
+    value ver;
     sadc adc;
     sdac dac;
     value out1;

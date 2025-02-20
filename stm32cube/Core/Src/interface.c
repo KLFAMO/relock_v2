@@ -48,6 +48,12 @@ pointer getPointer(pointer p, char *s)
       pout = (pointer){.p = (void *)&(ptmp->mode), .type = "value"};
     if (strcasecmp(s, "UNL") == 0)
       pout = (pointer){.p = (void *)&(ptmp->unl), .type = "unl"};
+    if (strcasecmp(s, "VER") == 0)
+      pout = (pointer){.p = (void *)&(ptmp->ver), .type = "value"};
+    if (strcasecmp(s, "SAVE") == 0)
+      pout = (pointer){.p = (void *)&(ptmp->save), .type = "value"};
+    if (strcasecmp(s, "LOAD") == 0)
+      pout = (pointer){.p = (void *)&(ptmp->load), .type = "value"};
   }
 
   if (strcmp(p.type, "adc") == 0)
@@ -183,6 +189,8 @@ void setParam(value *p, double val)
 
 void initInterface(void)
 {
+  par.version = 1; // version of parameters structure, increment if structure changes
+  par.ver = (value){.val = 1, .min = 0, .max = 100};
   par.mode = (value){.val = 0, .min = 0, .max = 1};
   par.out1 = (value){.val = 0, .min = -6, .max = 6}; // volts
   par.out2 = (value){.val = 0, .min = -6, .max = 6}; // volts
@@ -211,6 +219,9 @@ void initInterface(void)
   par.unl.sign = (value){.val = 1, .min = -1, .max = 1};
   par.unl.err = (value){.val = 0, .min = -100000, .max = 100000};
   par.unl.aerr = (value){.val = 0, .min = -10000000, .max = 10000000};
+
+  par.save = (value){.val = 0, .min = 0, .max = 1};
+  par.load = (value){.val = 0, .min = 0, .max = 1};
 }
 
 /*------------------------*/
