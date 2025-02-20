@@ -98,6 +98,14 @@ pointer getPointer(pointer p, char *s)
             pout = (pointer){.p = (void *)&(ptmp->f), .type = "value"};
       if (strcasecmp(s, "ON") == 0)
             pout = (pointer){.p = (void *)&(ptmp->on), .type = "value"};
+      if (strcasecmp(s, "FSET") == 0)
+            pout = (pointer){.p = (void *)&(ptmp->fset), .type = "value"};
+      if (strcasecmp(s, "LOCK") == 0)
+            pout = (pointer){.p = (void *)&(ptmp->lock), .type = "value"};
+      if (strcasecmp(s, "I") == 0)
+            pout = (pointer){.p = (void *)&(ptmp->i), .type = "value"};
+      if (strcasecmp(s, "MAXDIF") == 0)
+            pout = (pointer){.p = (void *)&(ptmp->maxdif), .type = "value"};
     }
   
   if (strcmp(p.type, "unl") == 0)
@@ -190,6 +198,11 @@ void initInterface(void)
   par.send = (value){.val = 0, .min = 0, .max = 1};
   par.wlm.f = (value){.val = 0, .min = 0, .max = 100000000};
   par.wlm.on = (value){.val = 0, .min = 0, .max = 1};
+  par.wlm.fset = (value){.val = 441.3327, .min = 0, .max = 100000};
+  par.wlm.lock = (value){.val = 0, .min = 0, .max = 1};
+  par.wlm.vout = (value){.val = 0, .min = -10, .max = 10};
+  par.wlm.i = (value){.val = 0, .min = -10000, .max = 10000};
+  par.wlm.maxdif = (value){.val = 0.002, .min = 0, .max = 0.1};
 
   par.unl.on = (value){.val = 0, .min = 0, .max = 1};
   par.unl.vset = (value){.val = 0, .min = 0, .max = 100000};

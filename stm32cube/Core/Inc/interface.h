@@ -61,6 +61,11 @@ typedef struct{
 typedef struct{
     value on;
     value f;
+    value fset;
+    value lock;
+    value vout;
+    value i;
+    value maxdif;
 } swlm;
 
 typedef struct{

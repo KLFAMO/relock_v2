@@ -563,11 +563,19 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
     par.in3.val = (double)adcResults[2];
 
     // reading wavelength
-    if (tim7_cnt > 5000 && par.wlm.on.val == 1){
+    if (tim7_cnt > 5000 && (par.wlm.on.val == 1 || par.wlm.lock.val == 1) ){
       tim7_cnt = 0;
 		  tcp_client_init(received_text);
 		  par.wlm.f.val = atofmy(received_text);
 		  received_text[0] = '\0';
+
+      if (par.wlm.lock.val == 1){
+        double err = par.wlm.f.val - par.wlm.fset.val;
+        if (fabs(err) < par.wlm.maxdif.val){ // 0.01 -> 10 GHz
+          // par.wlm.vout.val += err * par.wlm.i.val;
+          setParam(&par.out1, par.out1.val + err * par.wlm.i.val);
+        }
+      }
 	  }
     tim7_cnt++;
 
