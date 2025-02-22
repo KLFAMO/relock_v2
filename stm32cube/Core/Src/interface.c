@@ -234,7 +234,7 @@ void initInterface(void)
   par.send = (value){.val = 0, .min = 0, .max = 1};
   par.wlm.f = (value){.val = 0, .min = 0, .max = 100000000};
   par.wlm.on = (value){.val = 0, .min = 0, .max = 1};
-  par.wlm.fset = (value){.val = 434.8291, .min = 0, .max = 100000};
+  par.wlm.fset = (value){.val = 434.8305, .min = 0, .max = 100000};
   par.wlm.lock = (value){.val = 0, .min = 0, .max = 1};
   par.wlm.vout = (value){.val = 0, .min = -10, .max = 10};
   par.wlm.i = (value){.val = 0, .min = -10000, .max = 10000};
@@ -249,11 +249,11 @@ void initInterface(void)
   par.unl.aerr = (value){.val = 0, .min = -10000000, .max = 10000000};
 
   par.rlc.on = (value){.val = 0, .min = 0, .max = 1};
-  par.rlc.tresh = (value){.val = 0, .min = -10000000, .max = 100000000};
+  par.rlc.tresh = (value){.val = 7000, .min = -10000000, .max = 100000000};
 
   par.scan.on = (value){.val = 0, .min = 0, .max = 1};
-  par.scan.ampl = (value){.val = 0, .min = 0, .max = 1000000};
-  par.scan.step = (value){.val = 0, .min = 0, .max = 1000000};
+  par.scan.ampl = (value){.val = 0.9, .min = 0, .max = 1000000};
+  par.scan.step = (value){.val = 0.001, .min = 0, .max = 1000000};
   par.scan.cur = (value){.val = 0, .min = -100000000, .max = 1000000};
   par.scan.dir = (value){.val = 0, .min = -1, .max = 1};
 

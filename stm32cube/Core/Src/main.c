@@ -672,8 +672,11 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
     // relock to cavity mode
     if (par.rlc.on.val == 1){
       // locked to cavity
-      if (par.in1.val > par.rlc.tresh.val){
-        
+      if (par.in2.val > par.rlc.tresh.val){
+        setParam(&par.scan.on, 0);
+      }
+      else{
+        setParam(&par.scan.on, 1);
       }
     }
 
