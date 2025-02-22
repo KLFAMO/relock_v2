@@ -48,6 +48,10 @@ pointer getPointer(pointer p, char *s)
       pout = (pointer){.p = (void *)&(ptmp->mode), .type = "value"};
     if (strcasecmp(s, "UNL") == 0)
       pout = (pointer){.p = (void *)&(ptmp->unl), .type = "unl"};
+    if (strcasecmp(s, "RLC") == 0)
+      pout = (pointer){.p = (void *)&(ptmp->rlc), .type = "rlc"};
+    if (strcasecmp(s, "SCAN") == 0)
+      pout = (pointer){.p = (void *)&(ptmp->scan), .type = "scan"};
     if (strcasecmp(s, "VER") == 0)
       pout = (pointer){.p = (void *)&(ptmp->ver), .type = "value"};
     if (strcasecmp(s, "SAVE") == 0)
@@ -132,6 +136,30 @@ pointer getPointer(pointer p, char *s)
       if (strcasecmp(s, "AERR") == 0)
             pout = (pointer){.p = (void *)&(ptmp->aerr), .type = "value"};
     }
+  
+  if (strcmp(p.type, "rlc") == 0)
+    {
+      srlc *ptmp = (srlc *)p.p;
+      if (strcasecmp(s, "ON") == 0)
+            pout = (pointer){.p = (void *)&(ptmp->on), .type = "value"};
+      if (strcasecmp(s, "TRESH") == 0)
+            pout = (pointer){.p = (void *)&(ptmp->tresh), .type = "value"};
+    }
+  
+    if (strcmp(p.type, "scan") == 0)
+    {
+      sscan *ptmp = (sscan *)p.p;
+      if (strcasecmp(s, "ON") == 0)
+            pout = (pointer){.p = (void *)&(ptmp->on), .type = "value"};
+      if (strcasecmp(s, "AMPL") == 0)
+            pout = (pointer){.p = (void *)&(ptmp->ampl), .type = "value"};
+      if (strcasecmp(s, "STEP") == 0)
+            pout = (pointer){.p = (void *)&(ptmp->step), .type = "value"};
+      if (strcasecmp(s, "CUR") == 0)
+            pout = (pointer){.p = (void *)&(ptmp->cur), .type = "value"};
+      if (strcasecmp(s, "DIR") == 0)  
+            pout = (pointer){.p = (void *)&(ptmp->dir), .type = "value"};
+    }
 
   if (strcmp(p.type, "value") == 0)
   {
@@ -206,7 +234,7 @@ void initInterface(void)
   par.send = (value){.val = 0, .min = 0, .max = 1};
   par.wlm.f = (value){.val = 0, .min = 0, .max = 100000000};
   par.wlm.on = (value){.val = 0, .min = 0, .max = 1};
-  par.wlm.fset = (value){.val = 441.3327, .min = 0, .max = 100000};
+  par.wlm.fset = (value){.val = 434.8291, .min = 0, .max = 100000};
   par.wlm.lock = (value){.val = 0, .min = 0, .max = 1};
   par.wlm.vout = (value){.val = 0, .min = -10, .max = 10};
   par.wlm.i = (value){.val = 0, .min = -10000, .max = 10000};
@@ -219,6 +247,15 @@ void initInterface(void)
   par.unl.sign = (value){.val = 1, .min = -1, .max = 1};
   par.unl.err = (value){.val = 0, .min = -100000, .max = 100000};
   par.unl.aerr = (value){.val = 0, .min = -10000000, .max = 10000000};
+
+  par.rlc.on = (value){.val = 0, .min = 0, .max = 1};
+  par.rlc.tresh = (value){.val = 0, .min = -10000000, .max = 100000000};
+
+  par.scan.on = (value){.val = 0, .min = 0, .max = 1};
+  par.scan.ampl = (value){.val = 0, .min = 0, .max = 1000000};
+  par.scan.step = (value){.val = 0, .min = 0, .max = 1000000};
+  par.scan.cur = (value){.val = 0, .min = -100000000, .max = 1000000};
+  par.scan.dir = (value){.val = 0, .min = -1, .max = 1};
 
   par.save = (value){.val = 0, .min = 0, .max = 1};
   par.load = (value){.val = 0, .min = 0, .max = 1};

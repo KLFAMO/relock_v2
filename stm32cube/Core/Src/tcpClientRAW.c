@@ -115,7 +115,7 @@ struct tcp_client_struct *esTx = 0;
 
 struct tcp_pcb *pcbTx = 0;
 
-const char *test_message = "f 5";
+const char *test_message = "f 7";
 
 void send_test()
 {

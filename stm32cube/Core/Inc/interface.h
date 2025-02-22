@@ -81,6 +81,19 @@ typedef struct{
     value aerr;
 } sunl;
 
+typedef struct{
+    value on;
+    value tresh; // transmission threshold
+} srlc;
+
+typedef struct{
+    value on;
+    value ampl; // scan amplitude
+    value step; // scan step
+    value cur; // current scan position
+    value dir; // scan direction
+} sscan;
+
 typedef struct {
     double version;
     value save;
@@ -98,6 +111,8 @@ typedef struct {
     swlm wlm;
     value mode;
     sunl unl;
+    srlc rlc;
+    sscan scan;
 } parameters;
 
 pointer getPointer(pointer,char * );

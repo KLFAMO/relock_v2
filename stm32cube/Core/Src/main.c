@@ -618,8 +618,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 
     // get adc values
     Read_ADC_Values();
-	  par.in1.val = (double)adcResults[0];
-    par.in2.val = (double)adcResults[1];
+	  par.in1.val = (double)adcResults[0]; // signal for unlimited
+    par.in2.val = (double)adcResults[1]; // transimission signal
     par.in3.val = (double)adcResults[2];
 
     // reading wavelength
@@ -650,16 +650,14 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
     }
     par.unl.last_sw_on.val = par.unl.sw_on.val;
 
+    //unlimited mode
     if (par.unl.on.val == 1){
-      //unlimited mode
-
       if (par.unl.last_on.val == 0){
         // if unlim turned on - save setting point and reset controller
         setParam(&par.unl.vset, par.in1.val);
         setParam(&par.unl.aerr, 0);
       }
-
-      // controller
+      // controller: in1 - error signal,  out1 - pzt voltage
       setParam(&par.unl.err, par.in1.val - par.unl.vset.val);
       setParam(&par.unl.aerr, par.unl.aerr.val + par.unl.err.val);
       setParam(&par.out1, par.unl.I.val * par.unl.aerr.val);
@@ -670,6 +668,39 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
         setParam(&par.out1, 0);
     }
     par.unl.last_on.val = par.unl.on.val;
+
+    // relock to cavity mode
+    if (par.rlc.on.val == 1){
+      // locked to cavity
+      if (par.in1.val > par.rlc.tresh.val){
+        
+      }
+    }
+
+    // scan
+    if (par.scan.on.val == 1){
+      if (par.scan.dir.val == 1){
+        if (par.scan.cur.val + par.scan.step.val < par.scan.ampl.val){
+          par.scan.cur.val += par.scan.step.val;
+        }
+        else{
+          par.scan.dir.val = -1;
+        }
+      }
+      else{
+        if (par.scan.cur.val - par.scan.step.val > -par.scan.ampl.val){
+          par.scan.cur.val -= par.scan.step.val;
+        }
+        else{
+          par.scan.dir.val = 1;
+        }
+      }
+      setParam(&par.out1, par.scan.cur.val);
+    }
+    else{
+      par.scan.cur.val = 0;
+    }
+
 
     // update DAC based on par.out1, par.out2
 	  raw1 = (int)(2000 + par.out1.val*4000/12.0);
