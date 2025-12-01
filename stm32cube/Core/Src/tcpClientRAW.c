@@ -115,7 +115,7 @@ struct tcp_client_struct *esTx = 0;
 
 struct tcp_pcb *pcbTx = 0;
 
-const char *test_message = "f 7";
+char *test_message = "f 7";
 
 void send_test()
 {
@@ -140,6 +140,16 @@ void send_test()
 //	}
 
 }
+
+void set_test_message(int x)
+{
+    // we assume x is a single digit
+    test_message[0] = 'f';
+    test_message[1] = ' ';
+    test_message[2] = '0' + x; // convert x to ASCII
+    test_message[3] = '\0';
+}
+
 
 
 /* IMPLEMENTATION FOR TCP CLIENT

@@ -60,38 +60,51 @@ typedef struct{
 
 typedef struct{
     value on;
+    value mcnt;
+    value allow;
+} slock;
+
+typedef struct{
+    value on;
     value f;
     value fset;
-    value lock;
-    value vout;
+    value ok;
+    value okdif;
+    slock lock;
     value i;
     value maxdif;
+    value out;
+    value mcnt;
+    value ch; // wlm channel
 } swlm;
 
 typedef struct{
     value on;
+    value allow;
     value last_on;
-    value sw_on;
-    value last_sw_on;
     value vset;
     value P;
     value I;
     value sign;
     value err;
     value aerr;
+    value out;
 } sunl;
 
 typedef struct{
     value on;
     value tresh; // transmission threshold
+    value cnt; // counter - locked time
+    value mcnt; // min cnt to tread that locked
+    value locked; // locked flag
 } srlc;
 
 typedef struct{
     value on;
     value ampl; // scan amplitude
     value step; // scan step
-    value cur; // current scan position
     value dir; // scan direction
+    value out; // scan output (current value)
 } sscan;
 
 typedef struct {
@@ -109,10 +122,13 @@ typedef struct {
     value in3;
     value send;
     swlm wlm;
-    value mode;
     sunl unl;
     srlc rlc;
     sscan scan;
+    value sw_on;
+    value last_sw_on;
+    value sw_allow;
+    value work;
 } parameters;
 
 pointer getPointer(pointer,char * );

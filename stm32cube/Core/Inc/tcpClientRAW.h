@@ -24,5 +24,6 @@
 
 void tcp_client_init(char *received_text_ptr);
 void send_test();
+void set_test_message(int);
 
 #endif /* INC_TCPCLIENTRAW_H_ */

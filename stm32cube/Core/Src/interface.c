@@ -44,8 +44,6 @@ pointer getPointer(pointer p, char *s)
       pout = (pointer){.p = (void *)&(ptmp->send), .type = "value"};
     if (strcasecmp(s, "WLM") == 0)
       pout = (pointer){.p = (void *)&(ptmp->wlm), .type = "wlm"};
-    if (strcasecmp(s, "MODE") == 0)
-      pout = (pointer){.p = (void *)&(ptmp->mode), .type = "value"};
     if (strcasecmp(s, "UNL") == 0)
       pout = (pointer){.p = (void *)&(ptmp->unl), .type = "unl"};
     if (strcasecmp(s, "RLC") == 0)
@@ -58,6 +56,12 @@ pointer getPointer(pointer p, char *s)
       pout = (pointer){.p = (void *)&(ptmp->save), .type = "value"};
     if (strcasecmp(s, "LOAD") == 0)
       pout = (pointer){.p = (void *)&(ptmp->load), .type = "value"};
+    if (strcasecmp(s, "SW_ON") == 0)
+      pout = (pointer){.p = (void *)&(ptmp->sw_on), .type = "value"};
+    if (strcasecmp(s, "WORK") == 0)
+      pout = (pointer){.p = (void *)&(ptmp->work), .type = "value"};
+    if (strcasecmp(s, "SW_ALLOW") == 0)
+      pout = (pointer){.p = (void *)&(ptmp->sw_allow), .type = "value"};
   }
 
   if (strcmp(p.type, "adc") == 0)
@@ -104,6 +108,8 @@ pointer getPointer(pointer p, char *s)
   if (strcmp(p.type, "wlm") == 0)
     {
       swlm *ptmp = (swlm *)p.p;
+      if (strcasecmp(s, "OK") == 0)
+            pout = (pointer){.p = (void *)&(ptmp->ok), .type = "value"};
       if (strcasecmp(s, "F") == 0)
             pout = (pointer){.p = (void *)&(ptmp->f), .type = "value"};
       if (strcasecmp(s, "ON") == 0)
@@ -111,11 +117,19 @@ pointer getPointer(pointer p, char *s)
       if (strcasecmp(s, "FSET") == 0)
             pout = (pointer){.p = (void *)&(ptmp->fset), .type = "value"};
       if (strcasecmp(s, "LOCK") == 0)
-            pout = (pointer){.p = (void *)&(ptmp->lock), .type = "value"};
+            pout = (pointer){.p = (void *)&(ptmp->lock), .type = "lock"};
       if (strcasecmp(s, "I") == 0)
             pout = (pointer){.p = (void *)&(ptmp->i), .type = "value"};
       if (strcasecmp(s, "MAXDIF") == 0)
             pout = (pointer){.p = (void *)&(ptmp->maxdif), .type = "value"};
+      if (strcasecmp(s, "OUT") == 0)
+            pout = (pointer){.p = (void *)&(ptmp->out), .type = "value"};
+      if (strcasecmp(s, "MCNT") == 0)
+            pout = (pointer){.p = (void *)&(ptmp->mcnt), .type = "value"};
+      if (strcasecmp(s, "OKDIF") == 0)
+            pout = (pointer){.p = (void *)&(ptmp->okdif), .type = "value"};
+      if (strcasecmp(s, "CH") == 0)
+            pout = (pointer){.p = (void *)&(ptmp->ch), .type = "value"};
     }
   
   if (strcmp(p.type, "unl") == 0)
@@ -123,6 +137,10 @@ pointer getPointer(pointer p, char *s)
       sunl *ptmp = (sunl *)p.p;
       if (strcasecmp(s, "ON") == 0)
             pout = (pointer){.p = (void *)&(ptmp->on), .type = "value"};
+      if (strcasecmp(s, "ALLOW") == 0)
+            pout = (pointer){.p = (void *)&(ptmp->allow), .type = "value"};
+      if (strcasecmp(s, "LAST_ON") == 0)
+            pout = (pointer){.p = (void *)&(ptmp->last_on), .type = "value"};
       if (strcasecmp(s, "VSET") == 0)
             pout = (pointer){.p = (void *)&(ptmp->vset), .type = "value"};
       if (strcasecmp(s, "P") == 0)
@@ -135,6 +153,8 @@ pointer getPointer(pointer p, char *s)
             pout = (pointer){.p = (void *)&(ptmp->err), .type = "value"};
       if (strcasecmp(s, "AERR") == 0)
             pout = (pointer){.p = (void *)&(ptmp->aerr), .type = "value"};
+      if (strcasecmp(s, "OUT") == 0) 
+            pout = (pointer){.p = (void *)&(ptmp->out), .type = "value"};
     }
   
   if (strcmp(p.type, "rlc") == 0)
@@ -144,6 +164,12 @@ pointer getPointer(pointer p, char *s)
             pout = (pointer){.p = (void *)&(ptmp->on), .type = "value"};
       if (strcasecmp(s, "TRESH") == 0)
             pout = (pointer){.p = (void *)&(ptmp->tresh), .type = "value"};
+      if (strcasecmp(s, "CNT") == 0)
+            pout = (pointer){.p = (void *)&(ptmp->cnt), .type = "value"};
+      if (strcasecmp(s, "MCNT") == 0)
+            pout = (pointer){.p = (void *)&(ptmp->mcnt), .type = "value"};
+      if (strcasecmp(s, "LOCKED") == 0)
+            pout = (pointer){.p = (void *)&(ptmp->locked), .type = "value"};
     }
   
     if (strcmp(p.type, "scan") == 0)
@@ -155,10 +181,21 @@ pointer getPointer(pointer p, char *s)
             pout = (pointer){.p = (void *)&(ptmp->ampl), .type = "value"};
       if (strcasecmp(s, "STEP") == 0)
             pout = (pointer){.p = (void *)&(ptmp->step), .type = "value"};
-      if (strcasecmp(s, "CUR") == 0)
-            pout = (pointer){.p = (void *)&(ptmp->cur), .type = "value"};
+      if (strcasecmp(s, "OUT") == 0)
+            pout = (pointer){.p = (void *)&(ptmp->out), .type = "value"};
       if (strcasecmp(s, "DIR") == 0)  
             pout = (pointer){.p = (void *)&(ptmp->dir), .type = "value"};
+    }
+
+    if (strcmp(p.type, "lock") == 0)
+    {
+      slock *ptmp = (slock *)p.p;
+      if (strcasecmp(s, "ON") == 0)
+            pout = (pointer){.p = (void *)&(ptmp->on), .type = "value"};
+      if (strcasecmp(s, "MCNT") == 0)
+            pout = (pointer){.p = (void *)&(ptmp->mcnt), .type = "value"};
+      if (strcasecmp(s, "ALLOW") == 0)
+            pout = (pointer){.p = (void *)&(ptmp->allow), .type = "value"};
     }
 
   if (strcmp(p.type, "value") == 0)
@@ -217,9 +254,8 @@ void setParam(value *p, double val)
 
 void initInterface(void)
 {
-  par.version = 1; // version of parameters structure, increment if structure changes
+  par.version = 8; // version of parameters structure, increment if structure changes
   par.ver = (value){.val = 1, .min = 0, .max = 100};
-  par.mode = (value){.val = 0, .min = 0, .max = 1};
   par.out1 = (value){.val = 0, .min = -6, .max = 6}; // volts
   par.out2 = (value){.val = 0, .min = -6, .max = 6}; // volts
   par.rout1 = (value){.val = 0, .min = 0, .max = 4000};
@@ -232,29 +268,46 @@ void initInterface(void)
   par.adc.ch1.corfactor = (value){.val = 1, .min = 0, .max = 100};
   par.dac.ch1.volt = (value){.val = 0, .min = 0, .max = 5};
   par.send = (value){.val = 0, .min = 0, .max = 1};
+  par.sw_on = (value){.val = 0, .min = 0, .max = 1};
+  par.last_sw_on = (value){.val = 0, .min = 0, .max = 1};
+  par.work = (value){.val = 0, .min = 0, .max = 1};
+  par.sw_allow = (value){.val = 0, .min = 0, .max = 1};
+
   par.wlm.f = (value){.val = 0, .min = 0, .max = 100000000};
   par.wlm.on = (value){.val = 0, .min = 0, .max = 1};
-  par.wlm.fset = (value){.val = 434.8305, .min = 0, .max = 100000};
-  par.wlm.lock = (value){.val = 0, .min = 0, .max = 1};
-  par.wlm.vout = (value){.val = 0, .min = -10, .max = 10};
-  par.wlm.i = (value){.val = 0, .min = -10000, .max = 10000};
+  par.wlm.fset = (value){.val = 434.8291, .min = 0, .max = 100000};
+  par.wlm.lock.on = (value){.val = 0, .min = 0, .max = 1};
+  par.wlm.lock.mcnt = (value){.val = 1000, .min = 0, .max = 100000};
+  par.wlm.lock.allow = (value){.val = 0, .min = 0, .max = 1};
+  par.wlm.i = (value){.val = -100, .min = -10000, .max = 10000};
   par.wlm.maxdif = (value){.val = 0.002, .min = 0, .max = 0.1};
-
+  par.wlm.out = (value){.val = 0, .min = -6, .max = 6};
+  par.wlm.ok = (value){.val = 0, .min = 0, .max = 1};
+  par.wlm.mcnt = (value){.val = 10000, .min = 0, .max = 100000};
+  par.wlm.okdif = (value){.val = 0.0002, .min = 0, .max = 0.1};
+  par.wlm.ch = (value){.val = 1, .min = 1, .max = 8};
+ 
   par.unl.on = (value){.val = 0, .min = 0, .max = 1};
+  par.unl.allow = (value){.val = 0, .min = 0, .max = 1};
+  par.unl.last_on = (value){.val = 0, .min = 0, .max = 1};
   par.unl.vset = (value){.val = 0, .min = 0, .max = 100000};
   par.unl.P = (value){.val = 0, .min = -100, .max = 100};
   par.unl.I = (value){.val = -0.0000003, .min = -100, .max = 100};
   par.unl.sign = (value){.val = 1, .min = -1, .max = 1};
   par.unl.err = (value){.val = 0, .min = -100000, .max = 100000};
   par.unl.aerr = (value){.val = 0, .min = -10000000, .max = 10000000};
+  par.unl.out = (value){.val = 0, .min = -6, .max = 6};
 
   par.rlc.on = (value){.val = 0, .min = 0, .max = 1};
   par.rlc.tresh = (value){.val = 7000, .min = -10000000, .max = 100000000};
+  par.rlc.cnt = (value){.val = 0, .min = 0, .max = 100000000};
+  par.rlc.mcnt = (value){.val = 100, .min = 0, .max = 100000000};
+  par.rlc.locked = (value){.val = 0, .min = 0, .max = 1};
 
   par.scan.on = (value){.val = 0, .min = 0, .max = 1};
-  par.scan.ampl = (value){.val = 0.9, .min = 0, .max = 1000000};
-  par.scan.step = (value){.val = 0.001, .min = 0, .max = 1000000};
-  par.scan.cur = (value){.val = 0, .min = -100000000, .max = 1000000};
+  par.scan.ampl = (value){.val = 0.9, .min = 0, .max = 6};
+  par.scan.step = (value){.val = 0.001, .min = 0, .max = 5};
+  par.scan.out = (value){.val = 0, .min = -6, .max = 6};
   par.scan.dir = (value){.val = 0, .min = -1, .max = 1};
 
   par.save = (value){.val = 0, .min = 0, .max = 1};

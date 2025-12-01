@@ -622,36 +622,116 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
     par.in2.val = (double)adcResults[1]; // transimission signal
     par.in3.val = (double)adcResults[2];
 
-    // reading wavelength
-    if (tim7_cnt > 5000 && (par.wlm.on.val == 1 || par.wlm.lock.val == 1) ){
-      tim7_cnt = 0;
-		  tcp_client_init(received_text);
-		  par.wlm.f.val = atofmy(received_text);
-		  received_text[0] = '\0';
-
-      if (par.wlm.lock.val == 1){
-        double err = par.wlm.f.val - par.wlm.fset.val;
-        if (fabs(err) < par.wlm.maxdif.val){ // 0.01 -> 10 GHz
-          // par.wlm.vout.val += err * par.wlm.i.val;
-          setParam(&par.out1, par.out1.val + err * par.wlm.i.val);
-        }
-      }
-	  }
-    tim7_cnt++;
-
     //check switch status
     if(HAL_GPIO_ReadPin(PUSH_GPIO_Port, PUSH_Pin)==GPIO_PIN_SET){
-      par.unl.sw_on.val = 0;
+      par.sw_on.val = 0;
     }else{
-      par.unl.sw_on.val = 1;
+      par.sw_on.val = 1;
     }
-    if (par.unl.sw_on.val != par.unl.last_sw_on.val){
-      par.unl.on.val = par.unl.sw_on.val;
+
+    if (par.sw_allow.val == 1){
+      setParam(&par.work, par.sw_on.val);
     }
-    par.unl.last_sw_on.val = par.unl.sw_on.val;
+
+    // if (par.sw_on.val != par.last_sw_on.val){
+    //   // par.unl.on.val = par.sw_on.val;
+    // }
+    // par.last_sw_on.val = par.sw_on.val;
+
+    if (par.wlm.on.val == 1 && par.work.val == 1 ){
+      // reading wavelength
+      if (tim7_cnt > par.wlm.mcnt.val ){
+        tim7_cnt = 0;
+        set_test_message((int)par.wlm.ch.val);
+        tcp_client_init(received_text);
+        par.wlm.f.val = atofmy(received_text);
+        received_text[0] = '\0';
+        // check if locked
+        if (fabs(par.wlm.f.val - par.wlm.fset.val) < par.wlm.okdif.val){
+          setParam(&par.wlm.ok, 1);
+        }
+        else{
+          setParam(&par.wlm.ok, 0);
+        }
+
+        if (par.wlm.ok.val == 0 && par.wlm.lock.allow.val == 1 && par.rlc.locked.val == 0){
+          setParam(&par.wlm.lock.on, 1);
+        }
+      }
+
+      // wlm lock
+      if (tim7_cnt > par.wlm.lock.mcnt.val && par.wlm.lock.on.val == 1 && par.wlm.lock.allow.val == 1){
+        tim7_cnt = 0;
+        set_test_message((int)par.wlm.ch.val);
+        tcp_client_init(received_text);
+        par.wlm.f.val = atofmy(received_text);
+        received_text[0] = '\0';
+        double err = par.wlm.f.val - par.wlm.fset.val;
+        if (fabs(err) < par.wlm.maxdif.val){ // 0.01 -> 10 GHz
+          setParam(&par.wlm.out, par.wlm.out.val + err * par.wlm.i.val);
+        }
+        // check if locked
+        if (fabs(par.wlm.f.val - par.wlm.fset.val) < par.wlm.okdif.val){
+          setParam(&par.wlm.ok, 1);
+        }
+        else{
+          setParam(&par.wlm.ok, 0);
+        }
+
+        if (par.wlm.ok.val == 1){
+          setParam(&par.wlm.lock.on, 0);
+        }
+      }
+    
+      tim7_cnt++;
+    }
+
+    // relock to cavity mode
+    if (par.rlc.on.val == 1 && par.work.val == 1){
+      // locked to cavity
+      if (par.in2.val > par.rlc.tresh.val){
+        // cav locked and wlm ok
+        if( (par.wlm.on.val == 1 && par.wlm.ok.val == 1) || (par.wlm.on.val == 0)){
+          setParam(&par.rlc.locked, 1);
+          setParam(&par.scan.on, 0);
+          setParam(&par.wlm.lock.on, 0);
+          // check if cavity is locked for some time
+          if (par.unl.allow.val == 1){
+            if (par.rlc.cnt.val > par.rlc.mcnt.val){
+              setParam(&par.unl.on, 1);
+              setParam(&par.rlc.cnt, 0);
+            }
+            else{
+              setParam(&par.rlc.cnt, par.rlc.cnt.val + 1);
+            }
+          }
+        }
+        // cav locked but wlm not ok
+        else{ 
+          setParam(&par.rlc.locked, 0);
+          setParam(&par.unl.on, 0);
+          setParam(&par.scan.on, 0);
+          setParam(&par.rlc.cnt, 0); // reset lock counter
+          if (par.wlm.on.val == 1 && par.wlm.lock.allow.val == 1){
+            setParam(&par.wlm.lock.on, 1);
+          }
+        }
+      }
+      else{  // not locked to cavity
+        setParam(&par.rlc.locked, 0); // not locked to cavity
+        setParam(&par.rlc.cnt, 0); // reset lock counter
+        setParam(&par.unl.on, 0); // turn off unlimited
+        if( (par.wlm.on.val == 1 && par.wlm.ok.val == 1) || (par.wlm.on.val == 0)){
+          setParam(&par.scan.on, 1); // turn on scan
+        }
+        else{
+          setParam(&par.scan.on, 0);
+        }
+      }
+    }
 
     //unlimited mode
-    if (par.unl.on.val == 1){
+    if (par.unl.on.val == 1 && par.work.val == 1){
       if (par.unl.last_on.val == 0){
         // if unlim turned on - save setting point and reset controller
         setParam(&par.unl.vset, par.in1.val);
@@ -660,49 +740,42 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
       // controller: in1 - error signal,  out1 - pzt voltage
       setParam(&par.unl.err, par.in1.val - par.unl.vset.val);
       setParam(&par.unl.aerr, par.unl.aerr.val + par.unl.err.val);
-      setParam(&par.out1, par.unl.I.val * par.unl.aerr.val);
+      setParam(&par.unl.out, par.unl.I.val * par.unl.aerr.val);
     }
     else{
-      // when switching off unlim, set out to 0
-      if (par.unl.last_on.val == 1)
-        setParam(&par.out1, 0);
+      setParam(&par.unl.on, 0); // need in case if work is off
+      setParam(&par.unl.out, 0);
     }
-    par.unl.last_on.val = par.unl.on.val;
-
-    // relock to cavity mode
-    if (par.rlc.on.val == 1){
-      // locked to cavity
-      if (par.in2.val > par.rlc.tresh.val){
-        setParam(&par.scan.on, 0);
-      }
-      else{
-        setParam(&par.scan.on, 1);
-      }
-    }
+    setParam(&par.unl.last_on, par.unl.on.val);
 
     // scan
-    if (par.scan.on.val == 1){
+    if (par.scan.on.val == 1 && par.work.val == 1){
       if (par.scan.dir.val == 1){
-        if (par.scan.cur.val + par.scan.step.val < par.scan.ampl.val){
-          par.scan.cur.val += par.scan.step.val;
+        if (par.scan.out.val + par.scan.step.val < par.scan.ampl.val){
+          setParam(&par.scan.out, par.scan.out.val + par.scan.step.val);
         }
         else{
           par.scan.dir.val = -1;
         }
       }
       else{
-        if (par.scan.cur.val - par.scan.step.val > -par.scan.ampl.val){
-          par.scan.cur.val -= par.scan.step.val;
+        if (par.scan.out.val - par.scan.step.val > -par.scan.ampl.val){
+          setParam(&par.scan.out, par.scan.out.val - par.scan.step.val);
         }
         else{
           par.scan.dir.val = 1;
         }
       }
-      setParam(&par.out1, par.scan.cur.val);
     }
-    else{
-      par.scan.cur.val = 0;
+    
+    if (par.work.val == 0){
+      setParam(&par.wlm.out, 0);
+      setParam(&par.unl.out, 0);
+      setParam(&par.scan.out, 0);
     }
+
+    // calculate out1 - piezo voltage
+    setParam(&par.out1, par.scan.out.val + par.unl.out.val + par.wlm.out.val);
 
 
     // update DAC based on par.out1, par.out2
