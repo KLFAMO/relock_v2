@@ -129,6 +129,8 @@ typedef struct {
     value last_sw_on;
     value sw_allow;
     value work;
+    value p1;
+    value p2;
 } parameters;
 
 pointer getPointer(pointer,char * );

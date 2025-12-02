@@ -62,6 +62,10 @@ pointer getPointer(pointer p, char *s)
       pout = (pointer){.p = (void *)&(ptmp->work), .type = "value"};
     if (strcasecmp(s, "SW_ALLOW") == 0)
       pout = (pointer){.p = (void *)&(ptmp->sw_allow), .type = "value"};
+    if (strcasecmp(s, "P1") == 0)
+      pout = (pointer){.p = (void *)&(ptmp->p1), .type = "value"};
+    if (strcasecmp(s, "P2") == 0)
+      pout = (pointer){.p = (void *)&(ptmp->p2), .type = "value"};
   }
 
   if (strcmp(p.type, "adc") == 0)
@@ -309,6 +313,9 @@ void initInterface(void)
   par.scan.step = (value){.val = 0.001, .min = 0, .max = 5};
   par.scan.out = (value){.val = 0, .min = -6, .max = 6};
   par.scan.dir = (value){.val = 0, .min = -1, .max = 1};
+
+  par.p1 = (value){.val = 0, .min = -1000000, .max = 1000000};
+  par.p2 = (value){.val = 0, .min = -1000000, .max = 1000000};
 
   par.save = (value){.val = 0, .min = 0, .max = 1};
   par.load = (value){.val = 0, .min = 0, .max = 1};

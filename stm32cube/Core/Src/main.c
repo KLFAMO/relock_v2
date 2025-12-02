@@ -615,6 +615,19 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   if (htim->Instance == TIM7) {
 	  HAL_GPIO_WritePin(LD1_GPIO_Port, LD1_Pin, SET);
 
+    if par.p1.val < 1000{
+      setParam(&par.p1, par.p1.val + 1);
+    }
+    else{
+      setParam(&par.p1, 0);
+    } 
+
+    if par.p2.val < 1000{
+      setParam(&par.p2, par.p2.val + 1);
+    }
+    else{
+      setParam(&par.p2, 0);
+    }
 
     // get adc values
     Read_ADC_Values();
